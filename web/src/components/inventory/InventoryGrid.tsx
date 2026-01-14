@@ -8,7 +8,12 @@ import { useIntersection } from '../../hooks/useIntersection';
 
 const PAGE_SIZE = 30;
 
-const InventoryGrid: React.FC<{ inventory: Inventory }> = ({ inventory }) => {
+interface InventoryGridProps {
+  inventory: Inventory;
+  maxDisplaySlots?: number;
+}
+
+const InventoryGrid: React.FC<InventoryGridProps> = ({ inventory, maxDisplaySlots }) => {
   const weight = useMemo(
     () => (inventory.maxWeight !== undefined ? Math.floor(getTotalWeight(inventory.items) * 1000) / 1000 : 0),
     [inventory.maxWeight, inventory.items]
@@ -18,11 +23,21 @@ const InventoryGrid: React.FC<{ inventory: Inventory }> = ({ inventory }) => {
   const { ref, entry } = useIntersection({ threshold: 0.5 });
   const isBusy = useAppSelector((state) => state.inventory.isBusy);
 
+  // Calculate display count and dynamic height
+  const displayCount = maxDisplaySlots || inventory.slots;
+  const itemsToDisplay = inventory.items.slice(0, displayCount);
+  const gridCols = 5;
+  const gridRows = Math.ceil(displayCount / gridCols);
+  const gridSize = 9; // vh
+  const gridGap = 2; // px
+  const dynamicHeight = `calc(${gridRows} * (${gridSize}vh + 0.22vh) + ${gridRows} * ${gridGap}px)`;
+
   useEffect(() => {
     if (entry && entry.isIntersecting) {
       setPage((prev) => ++prev);
     }
   }, [entry]);
+
   return (
     <>
       <div className="inventory-grid-wrapper" style={{ pointerEvents: isBusy ? 'none' : 'auto' }}>
@@ -37,9 +52,13 @@ const InventoryGrid: React.FC<{ inventory: Inventory }> = ({ inventory }) => {
           </div>
           <WeightBar percent={inventory.maxWeight ? (weight / inventory.maxWeight) * 100 : 0} />
         </div>
-        <div className="inventory-grid-container" ref={containerRef}>
+        <div
+          className="inventory-grid-container"
+          ref={containerRef}
+          style={maxDisplaySlots ? { height: dynamicHeight } : undefined}
+        >
           <>
-            {inventory.items.slice(0, (page + 1) * PAGE_SIZE).map((item, index) => (
+            {itemsToDisplay.slice(0, (page + 1) * PAGE_SIZE).map((item, index) => (
               <InventorySlot
                 key={`${inventory.type}-${inventory.id}-${item.slot}`}
                 item={item}

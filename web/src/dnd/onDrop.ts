@@ -4,9 +4,22 @@ import { store } from '../store';
 import { DragSource, DropTarget, InventoryType, SlotWithItem } from '../typings';
 import { moveSlots, stackSlots, swapSlots } from '../store/inventory';
 import { Items } from '../store/items';
+import { fetchNui } from '../utils/fetchNui';
 
 export const onDrop = (source: DragSource, target?: DropTarget) => {
   const { inventory: state } = store.getState();
+
+  // If dragging to rightInventory but it's hidden, drop the item instead
+  if (target?.inventory === 'right' && !state.showRightInventory) {
+    const sourceSlot = state.leftInventory.items[source.item.slot - 1] as SlotWithItem;
+    const count = state.itemAmount || sourceSlot.count;
+
+    fetchNui('dropFromInventory', {
+      fromSlot: sourceSlot.slot,
+      count: count
+    });
+    return;
+  }
 
   const { sourceInventory, targetInventory } = getTargetInventory(state, source.inventory, target?.inventory);
 
@@ -41,8 +54,8 @@ export const onDrop = (source: DragSource, target?: DropTarget) => {
     state.shiftPressed && sourceSlot.count > 1 && sourceInventory.type !== 'shop'
       ? Math.floor(sourceSlot.count / 2)
       : state.itemAmount === 0 || state.itemAmount > sourceSlot.count
-      ? sourceSlot.count
-      : state.itemAmount;
+        ? sourceSlot.count
+        : state.itemAmount;
 
   const data = {
     fromSlot: sourceSlot,
@@ -63,16 +76,16 @@ export const onDrop = (source: DragSource, target?: DropTarget) => {
   isSlotWithItem(targetSlot, true)
     ? sourceData.stack && canStack(sourceSlot, targetSlot)
       ? store.dispatch(
-          stackSlots({
-            ...data,
-            toSlot: targetSlot,
-          })
-        )
+        stackSlots({
+          ...data,
+          toSlot: targetSlot,
+        })
+      )
       : store.dispatch(
-          swapSlots({
-            ...data,
-            toSlot: targetSlot,
-          })
-        )
+        swapSlots({
+          ...data,
+          toSlot: targetSlot,
+        })
+      )
     : store.dispatch(moveSlots(data));
 };

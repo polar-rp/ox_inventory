@@ -32,7 +32,7 @@ export const setupInventoryReducer: CaseReducer<
       }),
     };
 
-  if (rightInventory)
+  if (rightInventory) {
     state.rightInventory = {
       ...rightInventory,
       items: Array.from(Array(rightInventory.slots), (_, index) => {
@@ -50,6 +50,11 @@ export const setupInventoryReducer: CaseReducer<
         return item;
       }),
     };
+    // Hide rightInventory if it's the default 'newdrop' (ground/idle mode)
+    state.showRightInventory = rightInventory.type !== 'newdrop';
+  } else {
+    state.showRightInventory = false;
+  }
 
   state.shiftPressed = false;
   state.isBusy = false;

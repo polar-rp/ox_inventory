@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 import useNuiEvent from '../../hooks/useNuiEvent';
 import InventoryControl from './InventoryControl';
 import InventoryHotbar from './InventoryHotbar';
-import { useAppDispatch } from '../../store';
-import { refreshSlots, setAdditionalMetadata, setupInventory } from '../../store/inventory';
+import { useAppDispatch, useAppSelector } from '../../store';
+import { refreshSlots, setAdditionalMetadata, setupInventory, selectShowRightInventory } from '../../store/inventory';
 import { useExitListener } from '../../hooks/useExitListener';
 import type { Inventory as InventoryProps } from '../../typings';
 import RightInventory from './RightInventory';
@@ -16,6 +16,7 @@ import Fade from '../utils/transitions/Fade';
 
 const Inventory: React.FC = () => {
   const [inventoryVisible, setInventoryVisible] = useState(false);
+  const showRightInventory = useAppSelector(selectShowRightInventory);
   const dispatch = useAppDispatch();
 
   useNuiEvent<boolean>('setInventoryVisible', setInventoryVisible);
@@ -46,7 +47,7 @@ const Inventory: React.FC = () => {
         <div className="inventory-wrapper">
           <LeftInventory />
           <InventoryControl />
-          <RightInventory />
+          {showRightInventory && <RightInventory />}
           <Tooltip />
           <InventoryContext />
         </div>

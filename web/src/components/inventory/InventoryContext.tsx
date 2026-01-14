@@ -33,10 +33,11 @@ interface ButtonWithIndex extends Button {
   index: number;
 }
 
-interface GroupedButtons extends Array<Group> {}
+interface GroupedButtons extends Array<Group> { }
 
 const InventoryContext: React.FC = () => {
   const contextMenu = useAppSelector((state) => state.contextMenu);
+  const itemAmount = useAppSelector((state) => state.inventory.itemAmount);
   const item = contextMenu.item;
 
   const handleClick = (data: DataProps) => {
@@ -50,7 +51,14 @@ const InventoryContext: React.FC = () => {
         onGive({ name: item.name, slot: item.slot });
         break;
       case 'drop':
-        isSlotWithItem(item) && onDrop({ item: item, inventory: 'player' });
+        if (isSlotWithItem(item)) {
+          // Use itemAmount from Redux state (set by input dialog)
+          const count = itemAmount || item.count;
+          fetchNui('dropFromInventory', {
+            fromSlot: item.slot,
+            count: count
+          });
+        }
         break;
       case 'remove':
         fetchNui('removeComponent', { component: data?.component, slot: data?.slot });

@@ -64,10 +64,6 @@ return {
 		}
 	},
 
-	['black_money'] = {
-		label = 'Dirty Money',
-	},
-
 	['burger'] = {
 		label = 'Burger',
 		weight = 220,
@@ -134,8 +130,14 @@ return {
 	},
 
 	['lockpick'] = {
-		label = 'Lockpick',
+		label = 'wytrych',
 		weight = 160,
+		stack = false,
+		close = true,
+		description = 'Stary wytrych, ale może jeszcze się przydać',
+		decay = true,
+		consume = 0.2,
+		client = { export = 'polar-lockpick.useLockpick' }
 	},
 
 	['phone'] = {
@@ -160,6 +162,7 @@ return {
 
 	['money'] = {
 		label = 'Money',
+		model = 'prop_money_bag_01',
 	},
 
 	['mustard'] = {
@@ -176,14 +179,14 @@ return {
 
 	['water'] = {
 		label = 'Water',
+		model = `vw_prop_casino_water_bottle_01a`,
 		weight = 500,
 		client = {
 			status = { thirst = 200000 },
 			anim = { dict = 'mp_player_intdrink', clip = 'loop_bottle' },
-			prop = { model = `prop_ld_flow_bottle`, pos = vec3(0.03, 0.03, 0.02), rot = vec3(0.0, 0.0, -1.5) },
+			prop = { model = `vw_prop_casino_water_bottle_01a`, pos = vec3(0.03, 0.03, 0.02), rot = vec3(0.0, 0.0, -1.5) },
 			usetime = 2500,
 			cancel = true,
-			notification = 'You drank some refreshing water'
 		}
 	},
 
@@ -222,4 +225,10 @@ return {
 		label = 'Scrap Metal',
 		weight = 80,
 	},
+
+	['car_key'] = {
+		label = 'Kluczyk do pojazdu',
+		weight = 50,
+		stack = false,
+	}
 }
