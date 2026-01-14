@@ -148,13 +148,17 @@ return {
 		client = {
 			add = function(total)
 				if total > 0 then
-					pcall(function() return exports.npwd:setPhoneDisabled(false) end)
+					pcall(function()
+						return exports['polar-phone']:setDisablePhone(false)
+					end)
 				end
 			end,
 
 			remove = function(total)
 				if total < 1 then
-					pcall(function() return exports.npwd:setPhoneDisabled(true) end)
+					pcall(function()
+						return exports['polar-phone']:setDisablePhone(true)
+					end)
 				end
 			end
 		}
