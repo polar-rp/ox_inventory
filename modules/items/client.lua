@@ -135,9 +135,16 @@ Item('phone', function(data, slot)
 	end)
 
 	if success and phoneState then
-		exports['polar-phone']:setPhoneVisible(not phoneState.visible)
+		local mode = phoneState.mode
+
+		if mode == 'peek' then
+			exports['polar-phone']:setPhoneVisible(true)
+		else
+			exports['polar-phone']:setPhoneVisible(not phoneState.visible)
+		end
 	end
 end)
+
 
 Item('clothing', function(data, slot)
 	local metadata = slot.metadata

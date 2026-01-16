@@ -164,6 +164,15 @@ return {
 		}
 	},
 
+	['tuning_project'] = {
+		label = 'Projekt samochodu',
+		weight = 1,
+		stack = false,
+		close = true,
+		description = 'Mechanik może go użyć do tuningu pojazdu',
+		client = { export = 'polar-mechanic.tuningProject' }
+	},
+
 	['money'] = {
 		label = 'Money',
 		model = 'prop_money_bag_01',
