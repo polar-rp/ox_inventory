@@ -14,9 +14,8 @@ import useNuiEvent from './hooks/useNuiEvent';
 import { Items } from './store/items';
 import { Locale } from './store/locale';
 import { setImagePath } from './store/imagepath';
-import { setupInventory } from './store/inventory';
+import { useStore, selectSetupInventory, selectCloseTooltip } from './store';
 import { DragSource, DropTarget, Inventory, InventoryType } from './typings';
-import { useAppDispatch } from './store';
 import { debugData } from './utils/debugData';
 import { fetchNui } from './utils/fetchNui';
 import { onDrop } from './dnd/onDrop';
@@ -24,7 +23,6 @@ import { onBuy } from './dnd/onBuy';
 import { onCraft } from './dnd/onCraft';
 import { onUse } from './dnd/onUse';
 import { onGive } from './dnd/onGive';
-import { closeTooltip } from './store/tooltip';
 import KeyPress from './components/utils/KeyPress';
 
 debugData([
@@ -87,7 +85,8 @@ debugData([
 ]);
 
 const App: React.FC = () => {
-  const dispatch = useAppDispatch();
+  const setupInventory = useStore(selectSetupInventory);
+  const closeTooltip = useStore(selectCloseTooltip);
   const [activeDragData, setActiveDragData] = useState<DragSource | null>(null);
 
   const sensors = useSensors(
@@ -114,7 +113,7 @@ const App: React.FC = () => {
     for (const name in items) Items[name] = items[name];
 
     setImagePath(imagepath);
-    dispatch(setupInventory({ leftInventory }));
+    setupInventory({ leftInventory });
   });
 
   fetchNui('uiLoaded', {});
@@ -133,7 +132,7 @@ const App: React.FC = () => {
   const handleDragEnd = useCallback(
     (event: DragEndEvent) => {
       setActiveDragData(null);
-      dispatch(closeTooltip());
+      closeTooltip();
 
       const { active, over } = event;
 
@@ -167,7 +166,7 @@ const App: React.FC = () => {
           break;
       }
     },
-    [dispatch]
+    [closeTooltip]
   );
 
   return (

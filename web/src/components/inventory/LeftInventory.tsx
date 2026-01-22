@@ -1,9 +1,9 @@
+import React from 'react';
 import InventoryGrid from './InventoryGrid';
-import { useAppSelector } from '../../store';
-import { selectLeftInventory } from '../../store/inventory';
+import { useStore, selectLeftInventory } from '../../store';
 
 const LeftInventory: React.FC = () => {
-  const leftInventory = useAppSelector(selectLeftInventory);
+  const leftInventory = useStore(selectLeftInventory);
 
   return <InventoryGrid inventory={leftInventory} />;
 };

@@ -1,12 +1,15 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { Paper, Stack, Group, Text, SimpleGrid, ScrollArea, Box } from '@mantine/core';
 import { Inventory } from '../../typings';
 import WeightBar from '../utils/WeightBar';
 import InventorySlot from './InventorySlot';
 import { getTotalWeight } from '../../helpers';
-import { useAppSelector } from '../../store';
+import { useStore, selectIsBusy } from '../../store';
 import { useIntersection } from '../../hooks/useIntersection';
 
 const PAGE_SIZE = 30;
+const GRID_COLS = 5;
+const SLOT_SIZE = '9vh';
 
 interface InventoryGridProps {
   inventory: Inventory;
@@ -19,18 +22,14 @@ const InventoryGrid: React.FC<InventoryGridProps> = ({ inventory, maxDisplaySlot
     [inventory.maxWeight, inventory.items]
   );
   const [page, setPage] = useState(0);
-  const containerRef = useRef(null);
+  const containerRef = useRef<HTMLDivElement>(null);
   const { ref, entry } = useIntersection({ threshold: 0.5 });
-  const isBusy = useAppSelector((state) => state.inventory.isBusy);
+  const isBusy = useStore(selectIsBusy);
 
-  // Calculate display count and dynamic height
   const displayCount = maxDisplaySlots || inventory.slots;
   const itemsToDisplay = inventory.items.slice(0, displayCount);
-  const gridCols = 5;
-  const gridRows = Math.ceil(displayCount / gridCols);
-  const gridSize = 9; // vh
-  const gridGap = 2; // px
-  const dynamicHeight = `calc(${gridRows} * (${gridSize}vh + 0.22vh) + ${gridRows} * ${gridGap}px)`;
+  const gridRows = Math.ceil(displayCount / GRID_COLS);
+  const dynamicHeight = maxDisplaySlots ? `calc(${gridRows} * (${SLOT_SIZE} + 2px))` : `calc(5 * (${SLOT_SIZE} + 2px))`;
 
   useEffect(() => {
     if (entry && entry.isIntersecting) {
@@ -39,25 +38,27 @@ const InventoryGrid: React.FC<InventoryGridProps> = ({ inventory, maxDisplaySlot
   }, [entry]);
 
   return (
-    <>
-      <div className="inventory-grid-wrapper" style={{ pointerEvents: isBusy ? 'none' : 'auto' }}>
-        <div>
-          <div className="inventory-grid-header-wrapper">
-            <p>{inventory.label}</p>
+    <Paper
+      shadow="md"
+      p="xs"
+      withBorder
+      style={{ pointerEvents: isBusy ? 'none' : 'auto' }}
+    >
+      <Stack gap="xs">
+        <Box>
+          <Group justify="space-between" mb={4}>
+            <Text size="sm" fw={500}>{inventory.label}</Text>
             {inventory.maxWeight && (
-              <p>
+              <Text size="sm" c="dimmed">
                 {weight / 1000}/{inventory.maxWeight / 1000}kg
-              </p>
+              </Text>
             )}
-          </div>
+          </Group>
           <WeightBar percent={inventory.maxWeight ? (weight / inventory.maxWeight) * 100 : 0} />
-        </div>
-        <div
-          className="inventory-grid-container"
-          ref={containerRef}
-          style={maxDisplaySlots ? { height: dynamicHeight } : undefined}
-        >
-          <>
+        </Box>
+
+        <ScrollArea h={dynamicHeight} ref={containerRef} scrollbars="y">
+          <SimpleGrid cols={GRID_COLS} spacing={4}>
             {itemsToDisplay.slice(0, (page + 1) * PAGE_SIZE).map((item, index) => (
               <InventorySlot
                 key={`${inventory.type}-${inventory.id}-${item.slot}`}
@@ -68,10 +69,10 @@ const InventoryGrid: React.FC<InventoryGridProps> = ({ inventory, maxDisplaySlot
                 inventoryId={inventory.id}
               />
             ))}
-          </>
-        </div>
-      </div>
-    </>
+          </SimpleGrid>
+        </ScrollArea>
+      </Stack>
+    </Paper>
   );
 };
 

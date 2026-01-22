@@ -1,15 +1,14 @@
 import { useEffect } from 'react';
-import { setShiftPressed } from '../../store/inventory';
+import { useStore, selectSetShiftPressed } from '../../store';
 import useKeyPress from '../../hooks/useKeyPress';
-import { useAppDispatch } from '../../store';
 
 const KeyPress: React.FC = () => {
-  const dispatch = useAppDispatch();
+  const setShiftPressed = useStore(selectSetShiftPressed);
   const shiftPressed = useKeyPress('Shift');
 
   useEffect(() => {
-    dispatch(setShiftPressed(shiftPressed));
-  }, [shiftPressed, dispatch]);
+    setShiftPressed(shiftPressed);
+  }, [shiftPressed, setShiftPressed]);
 
   return <></>;
 };

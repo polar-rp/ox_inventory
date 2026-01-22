@@ -1,11 +1,11 @@
 import { isSlotWithItem } from '../helpers';
-import { store } from '../store';
+import { useStore } from '../store';
 import { DragSource, DropTarget } from '../typings';
 import { Items } from '../store/items';
-import { buyItem } from '../thunks/buyItem';
+import { buyItem } from '../store/actions/buyItem';
 
 export const onBuy = (source: DragSource, target: DropTarget) => {
-  const { inventory: state } = store.getState();
+  const state = useStore.getState();
 
   const sourceInventory = state.rightInventory;
   const targetInventory = state.leftInventory;
@@ -41,11 +41,9 @@ export const onBuy = (source: DragSource, target: DropTarget) => {
     count: count,
   };
 
-  store.dispatch(
-    buyItem({
-      ...data,
-      fromSlot: sourceSlot.slot,
-      toSlot: targetSlot.slot,
-    })
-  );
+  buyItem({
+    ...data,
+    fromSlot: sourceSlot.slot,
+    toSlot: targetSlot.slot,
+  });
 };

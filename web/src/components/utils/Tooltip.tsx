@@ -1,10 +1,10 @@
 import { flip, FloatingPortal, offset, shift, useFloating, useTransitionStyles } from '@floating-ui/react';
 import React, { useEffect } from 'react';
-import { useAppSelector } from '../../store';
+import { useStore, selectTooltip } from '../../store';
 import SlotTooltip from '../inventory/SlotTooltip';
 
 const Tooltip: React.FC = () => {
-  const hoverData = useAppSelector((state) => state.tooltip);
+  const hoverData = useStore(selectTooltip);
 
   const { refs, context, floatingStyles } = useFloating({
     middleware: [flip(), shift(), offset({ mainAxis: 10, crossAxis: 10 })],

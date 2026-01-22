@@ -1,9 +1,7 @@
 import React from 'react';
 import { createRoot } from 'react-dom/client';
-import { Provider } from 'react-redux';
 import { MantineProvider } from '@mantine/core';
 import { theme } from "./theme"
-import { store } from './store';
 import App from './App';
 import '@mantine/core/styles.css';
 import './index.scss';
@@ -22,12 +20,10 @@ if (isEnvBrowser()) {
 
 createRoot(root!).render(
   <React.StrictMode>
-    <Provider store={store}>
-      <MantineProvider forceColorScheme='dark' theme={theme}>
-        <ItemNotificationsProvider>
-          <App />
-        </ItemNotificationsProvider>
-      </MantineProvider>
-    </Provider>
+    <MantineProvider forceColorScheme='dark' theme={theme}>
+      <ItemNotificationsProvider>
+        <App />
+      </ItemNotificationsProvider>
+    </MantineProvider>
   </React.StrictMode>
 );

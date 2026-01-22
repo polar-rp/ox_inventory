@@ -1,6 +1,6 @@
 import { Inventory, InventoryType, ItemData, Slot, SlotWithItem, State } from '../typings';
 import { isEqual } from 'lodash';
-import { store } from '../store';
+import { useStore } from '../store';
 import { Items } from '../store/items';
 import { imagepath } from '../store/imagepath';
 import { fetchNui } from '../utils/fetchNui';
@@ -12,7 +12,7 @@ export const canPurchaseItem = (item: Slot, inventory: { type: Inventory['type']
 
   if (item.grade === undefined || !inventory.groups) return true;
 
-  const leftInventory = store.getState().inventory.leftInventory;
+  const leftInventory = useStore.getState().leftInventory;
 
   // Shop requires groups but player has none
   if (!leftInventory.groups) return false;
@@ -51,7 +51,7 @@ export const canPurchaseItem = (item: Slot, inventory: { type: Inventory['type']
 export const canCraftItem = (item: Slot, inventoryType: string) => {
   if (!isSlotWithItem(item) || inventoryType !== 'crafting') return true;
   if (!item.ingredients) return true;
-  const leftInventory = store.getState().inventory.leftInventory;
+  const leftInventory = useStore.getState().leftInventory;
   const ingredientItems = Object.entries(item.ingredients);
 
   const remainingItems = ingredientItems.filter((ingredient) => {

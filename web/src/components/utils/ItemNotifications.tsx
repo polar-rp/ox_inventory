@@ -108,7 +108,7 @@ export const ItemNotificationsProvider = ({ children }: { children: React.ReactN
   }, []);
 
   return (
-    <ItemNotificationsContext.Provider value={{ add }}>
+    <ItemNotificationsContext value={{ add }}>
       {children}
       <Affix position={{ bottom: 30, left: '50%' }} style={{ transform: 'translateX(-50%)', zIndex: 1000 }}>
         <Group gap="md" wrap="nowrap" justify="center">
@@ -128,6 +128,6 @@ export const ItemNotificationsProvider = ({ children }: { children: React.ReactN
           ))}
         </Group>
       </Affix>
-    </ItemNotificationsContext.Provider>
+    </ItemNotificationsContext>
   );
 };

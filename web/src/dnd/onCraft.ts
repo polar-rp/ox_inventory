@@ -1,11 +1,11 @@
-import { store } from '../store';
+import { useStore } from '../store';
 import { DragSource, DropTarget } from '../typings';
 import { isSlotWithItem } from '../helpers';
 import { Items } from '../store/items';
-import { craftItem } from '../thunks/craftItem';
+import { craftItem } from '../store/actions/craftItem';
 
 export const onCraft = (source: DragSource, target: DropTarget) => {
-  const { inventory: state } = store.getState();
+  const state = useStore.getState();
 
   const sourceInventory = state.rightInventory;
   const targetInventory = state.leftInventory;
@@ -34,11 +34,9 @@ export const onCraft = (source: DragSource, target: DropTarget) => {
     count,
   };
 
-  store.dispatch(
-    craftItem({
-      ...data,
-      fromSlot: sourceSlot.slot,
-      toSlot: targetSlot.slot,
-    })
-  );
+  craftItem({
+    ...data,
+    fromSlot: sourceSlot.slot,
+    toSlot: targetSlot.slot,
+  });
 };

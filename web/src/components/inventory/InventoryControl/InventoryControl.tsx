@@ -1,17 +1,16 @@
 import React from "react";
 import { useDroppable } from "@dnd-kit/core";
-import { Button, NumberInput, Group, ActionIcon, Paper, Affix } from "@mantine/core";
-import { IconInfoCircle } from "@tabler/icons-react";
-import { useAppDispatch, useAppSelector } from "../../../store";
-import { selectItemAmount, setItemAmount } from "../../../store/inventory";
+import { Button, NumberInput, Group, ActionIcon, Paper, Affix, CloseButton } from "@mantine/core";
+import { IconInfoCircle, IconHandGrab, IconGift, IconLogout } from "@tabler/icons-react";
+import { useStore, selectItemAmount, selectSetItemAmount } from "../../../store";
 import { fetchNui } from "../../../utils/fetchNui";
 import { Locale } from "../../../store/locale";
 import UsefulControls from "../UsefulControls/UsefulControls";
 import { useDisclosure } from "@mantine/hooks";
 
 const InventoryControl: React.FC = () => {
-    const itemAmount = useAppSelector(selectItemAmount);
-    const dispatch = useAppDispatch();
+    const itemAmount = useStore(selectItemAmount);
+    const setItemAmount = useStore(selectSetItemAmount);
     const [infoVisible, { open, close }] = useDisclosure(false);
 
     const { setNodeRef: useRef, isOver: isOverUse } = useDroppable({
@@ -27,40 +26,64 @@ const InventoryControl: React.FC = () => {
     const handleAmountChange = (value: string | number) => {
         const numValue = typeof value === "string" ? parseFloat(value) : value;
         const sanitizedValue = isNaN(numValue) || numValue < 0 ? 0 : Math.floor(numValue);
-        dispatch(setItemAmount(sanitizedValue));
+        setItemAmount(sanitizedValue);
     };
+
+    const handleReset = () => setItemAmount(0);
 
     return (
         <>
             <UsefulControls opened={infoVisible} onClose={close} />
 
-            <Paper shadow="md" p="md" withBorder>
-                <Group >
+            <Paper shadow="md" p="xs" withBorder w="100%">
+                <Group justify="space-between">
                     <NumberInput
                         value={itemAmount}
                         onChange={handleAmountChange}
                         min={0}
-                        w={100}
+                        w={80}
                         hideControls
                         allowNegative={false}
                         allowDecimal={false}
+                        rightSection={
+                            itemAmount > 0 && (
+                                <CloseButton
+                                    size="sm"
+                                    onClick={handleReset}
+                                    aria-label="Reset amount"
+                                />
+                            )
+                        }
+                        rightSectionPointerEvents="auto"
                     />
 
-                    <Button
-                        ref={useRef}
-                        variant={isOverUse ? "light" : "filled"}
-                    >
-                        {Locale.ui_use || "Use"}
-                    </Button>
+                    <Group gap="xs">
+                        <Button
+                            ref={useRef}
+                            variant={isOverUse ? "light" : "filled"}
+                            leftSection={<IconHandGrab size={16} />}
+                            size="sm"
+                        >
+                            {Locale.ui_use || "Use"}
+                        </Button>
+
+                        <Button
+                            ref={giveRef}
+                            variant={isOverGive ? "light" : "filled"}
+                            leftSection={<IconGift size={16} />}
+                            size="sm"
+                        >
+                            {Locale.ui_give || "Give"}
+                        </Button>
+                    </Group>
 
                     <Button
-                        ref={giveRef}
-                        variant={isOverGive ? "light" : "filled"}
+                        onClick={() => fetchNui("exit")}
+                        variant="light"
+                        color="gray"
+                        leftSection={<IconLogout size={16} />}
+                        size="sm"
                     >
-                        {Locale.ui_give || "Give"}
-                    </Button>
-
-                    <Button onClick={() => fetchNui("exit")}>
                         {Locale.ui_close || "Close"}
                     </Button>
                 </Group>

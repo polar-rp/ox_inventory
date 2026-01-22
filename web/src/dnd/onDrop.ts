@@ -1,13 +1,12 @@
 import { canStack, findAvailableSlot, getTargetInventory, isSlotWithItem } from '../helpers';
-import { validateMove } from '../thunks/validateItems';
-import { store } from '../store';
+import { validateMove } from '../store/actions/validateMove';
+import { useStore } from '../store';
 import { DragSource, DropTarget, InventoryType, SlotWithItem } from '../typings';
-import { moveSlots, stackSlots, swapSlots } from '../store/inventory';
 import { Items } from '../store/items';
 import { fetchNui } from '../utils/fetchNui';
 
 export const onDrop = (source: DragSource, target?: DropTarget) => {
-  const { inventory: state } = store.getState();
+  const state = useStore.getState();
 
   // If dragging to rightInventory but it's hidden, drop the item instead
   if (target?.inventory === 'right' && !state.showRightInventory) {
@@ -65,27 +64,23 @@ export const onDrop = (source: DragSource, target?: DropTarget) => {
     count: count,
   };
 
-  store.dispatch(
-    validateMove({
-      ...data,
-      fromSlot: sourceSlot.slot,
-      toSlot: targetSlot.slot,
-    })
-  );
+  validateMove({
+    ...data,
+    fromSlot: sourceSlot.slot,
+    toSlot: targetSlot.slot,
+  });
+
+  const { moveSlots, stackSlots, swapSlots } = useStore.getState();
 
   isSlotWithItem(targetSlot, true)
     ? sourceData.stack && canStack(sourceSlot, targetSlot)
-      ? store.dispatch(
-        stackSlots({
+      ? stackSlots({
           ...data,
           toSlot: targetSlot,
         })
-      )
-      : store.dispatch(
-        swapSlots({
+      : swapSlots({
           ...data,
           toSlot: targetSlot,
         })
-      )
-    : store.dispatch(moveSlots(data));
+    : moveSlots(data);
 };

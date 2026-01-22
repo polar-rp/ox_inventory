@@ -6,9 +6,10 @@ import { fetchNui } from '../../utils/fetchNui';
 import { Locale } from '../../store/locale';
 import { isSlotWithItem } from '../../helpers';
 import { setClipboard } from '../../utils/setClipboard';
-import { useAppSelector } from '../../store';
+import { useStore, selectContextMenu, selectItemAmount } from '../../store';
 import React from 'react';
 import { Menu, MenuItem } from '../utils/menu/Menu';
+import { IconHandGrab, IconGift, IconTrash, IconCopy, IconEraserOff, IconPuzzle } from '@tabler/icons-react';
 
 interface DataProps {
   action: string;
@@ -36,8 +37,8 @@ interface ButtonWithIndex extends Button {
 interface GroupedButtons extends Array<Group> { }
 
 const InventoryContext: React.FC = () => {
-  const contextMenu = useAppSelector((state) => state.contextMenu);
-  const itemAmount = useAppSelector((state) => state.inventory.itemAmount);
+  const contextMenu = useStore(selectContextMenu);
+  const itemAmount = useStore(selectItemAmount);
   const item = contextMenu.item;
 
   const handleClick = (data: DataProps) => {
@@ -52,7 +53,7 @@ const InventoryContext: React.FC = () => {
         break;
       case 'drop':
         if (isSlotWithItem(item)) {
-          // Use itemAmount from Redux state (set by input dialog)
+          // Use itemAmount from Zustand state (set by input dialog)
           const count = itemAmount || item.count;
           fetchNui('dropFromInventory', {
             fromSlot: item.slot,
@@ -100,16 +101,33 @@ const InventoryContext: React.FC = () => {
   return (
     <>
       <Menu>
-        <MenuItem onClick={() => handleClick({ action: 'use' })} label={Locale.ui_use || 'Use'} />
-        <MenuItem onClick={() => handleClick({ action: 'give' })} label={Locale.ui_give || 'Give'} />
-        <MenuItem onClick={() => handleClick({ action: 'drop' })} label={Locale.ui_drop || 'Drop'} />
+        <MenuItem
+          onClick={() => handleClick({ action: 'use' })}
+          label={Locale.ui_use || 'Use'}
+          icon={<IconHandGrab size={14} />}
+        />
+        <MenuItem
+          onClick={() => handleClick({ action: 'give' })}
+          label={Locale.ui_give || 'Give'}
+          icon={<IconGift size={14} />}
+        />
+        <MenuItem
+          onClick={() => handleClick({ action: 'drop' })}
+          label={Locale.ui_drop || 'Drop'}
+          icon={<IconTrash size={14} />}
+        />
         {item && item.metadata?.ammo > 0 && (
-          <MenuItem onClick={() => handleClick({ action: 'removeAmmo' })} label={Locale.ui_remove_ammo} />
+          <MenuItem
+            onClick={() => handleClick({ action: 'removeAmmo' })}
+            label={Locale.ui_remove_ammo}
+            icon={<IconEraserOff size={14} />}
+          />
         )}
         {item && item.metadata?.serial && (
           <MenuItem
             onClick={() => handleClick({ action: 'copy', serial: item.metadata?.serial })}
             label={Locale.ui_copy}
+            icon={<IconCopy size={14} />}
           />
         )}
         {item && item.metadata?.components && item.metadata?.components.length > 0 && (
@@ -120,6 +138,7 @@ const InventoryContext: React.FC = () => {
                   key={index}
                   onClick={() => handleClick({ action: 'remove', component, slot: item.slot })}
                   label={Items[component]?.label || ''}
+                  icon={<IconPuzzle size={14} />}
                 />
               ))}
           </Menu>
