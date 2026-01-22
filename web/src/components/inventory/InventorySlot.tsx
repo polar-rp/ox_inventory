@@ -11,7 +11,7 @@ import { onUse } from '../../dnd/onUse';
 import { Locale } from '../../store/locale';
 import { useMergeRefs } from '@floating-ui/react';
 
-const SLOT_SIZE = '9vh';
+const SLOT_SIZE = '8vh';
 
 interface SlotProps {
   inventoryId: Inventory['id'];
@@ -35,13 +35,13 @@ function InventorySlot({ item, inventoryId, inventoryType, inventoryGroups, ref 
 
   const dragData: DragSource | null = isSlotWithItem(item, inventoryType !== InventoryType.SHOP)
     ? {
-        inventory: inventoryType as Inventory['type'],
-        item: {
-          name: item.name,
-          slot: item.slot,
-        },
-        image: item?.name ? `url(${getItemUrl(item) || 'none'}` : undefined,
-      }
+      inventory: inventoryType as Inventory['type'],
+      item: {
+        name: item.name,
+        slot: item.slot,
+      },
+      image: item?.name ? `url(${getItemUrl(item) || 'none'}` : undefined,
+    }
     : null;
 
   const {
@@ -111,16 +111,17 @@ function InventorySlot({ item, inventoryId, inventoryType, inventoryGroups, ref 
       h={SLOT_SIZE}
       pos="relative"
       style={{
+        outline: 'none',
         filter: isDisabled ? 'brightness(80%) grayscale(100%)' : undefined,
         opacity: isDragging ? 0.4 : 1.0,
         backgroundImage: item?.name ? `url(${getItemUrl(item as SlotWithItem)})` : undefined,
         backgroundRepeat: 'no-repeat',
         backgroundPosition: 'center',
-        backgroundSize: '7vh',
+        backgroundSize: '6vh',
         imageRendering: '-webkit-optimize-contrast',
         borderRadius: 'var(--mantine-radius-sm)',
-        border: isOver ? '1px dashed rgba(255,255,255,0.4)' : '1px solid var(--mantine-color-dark-4)',
-        backgroundColor: 'var(--mantine-color-dark-6)',
+        border: isOver ? '1px dashed rgba(255,255,255,0.4)' : '1px solid var(--mantine-color-default-border)',
+        backgroundColor: 'var(--mantine-color-default)',
         cursor: 'pointer',
       }}
     >
@@ -142,26 +143,19 @@ function InventorySlot({ item, inventoryId, inventoryType, inventoryGroups, ref 
             }
           }}
         >
-          <Group justify={isHotslot ? 'space-between' : 'flex-end'} align="flex-start" gap={2} wrap="nowrap">
+          <Group justify={isHotslot ? 'space-between' : 'flex-end'} align="flex-start" gap={2} p={2} wrap="nowrap">
             {isHotslot && (
               <Badge
-                size="xs"
-                color="gray.0"
-                c="dark"
+                size="sm"
+                variant="light"
                 radius="xs"
-                style={{ borderTopLeftRadius: 'var(--mantine-radius-sm)' }}
               >
                 {item.slot}
               </Badge>
             )}
-            <Group gap={2} p={2}>
-              {item.weight > 0 && (
-                <Text size="xs" c="dimmed">{formatWeight(item.weight)}</Text>
-              )}
-              {item.count && (
-                <Text size="xs" c="dimmed">{item.count.toLocaleString('en-us')}x</Text>
-              )}
-            </Group>
+            {item.count && (
+              <Text size="xs" c="dimmed">{item.count.toLocaleString('en-us')}x</Text>
+            )}
           </Group>
 
           <Stack gap={0}>
