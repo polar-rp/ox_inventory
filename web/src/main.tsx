@@ -1,10 +1,10 @@
 import React from 'react';
 import { createRoot } from 'react-dom/client';
 import { Provider } from 'react-redux';
-import { DndProvider } from 'react-dnd';
-import { TouchBackend } from 'react-dnd-touch-backend';
+import { MantineProvider } from '@mantine/core';
 import { store } from './store';
 import App from './App';
+import '@mantine/core/styles.css';
 import './index.scss';
 import { ItemNotificationsProvider } from './components/utils/ItemNotifications';
 import { isEnvBrowser } from './utils/misc';
@@ -22,11 +22,11 @@ if (isEnvBrowser()) {
 createRoot(root!).render(
   <React.StrictMode>
     <Provider store={store}>
-      <DndProvider backend={TouchBackend} options={{ enableMouseEvents: true }}>
+      <MantineProvider>
         <ItemNotificationsProvider>
           <App />
         </ItemNotificationsProvider>
-      </DndProvider>
+      </MantineProvider>
     </Provider>
   </React.StrictMode>
 );

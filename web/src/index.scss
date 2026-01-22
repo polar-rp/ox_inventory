@@ -487,44 +487,6 @@ button:active {
   justify-content: space-between;
 }
 
-// item notifications
-
-.item-notification-container {
-  display: flex;
-  overflow-x: scroll;
-  flex-wrap: nowrap;
-  gap: 2px;
-  position: absolute;
-  bottom: 20vh;
-  left: 50%;
-  width: 100%;
-  margin-left: calc(50% - calc($gridSize/2));
-  transform: translate(-50%);
-}
-
-.item-notification-action-box {
-  width: 100%;
-  color: $textColor;
-  background-color: $secondaryColor;
-  text-transform: uppercase;
-  text-align: center;
-  border-top-left-radius: 0.25vh;
-  border-top-right-radius: 0.25vh;
-  font-family: $mainFont;
-
-  p {
-    font-size: 11px;
-    padding: 2px;
-    font-weight: 600;
-  }
-}
-
-.item-notification-item-box {
-  @extend .inventory-slot;
-  height: $gridSize;
-  width: $gridSize;
-}
-
 .durability-bar {
   background: rgba(0, 0, 0, 0.5);
   height: 3px;
@@ -537,40 +499,4 @@ button:active {
   height: 0.8vh;
   border-radius: 5%;
   overflow: hidden;
-}
-
-.transition-fade-enter {
-  opacity: 0;
-}
-
-.transition-fade-enter-active {
-  opacity: 1;
-  transition: opacity 200ms;
-}
-
-.transition-fade-exit {
-  opacity: 1;
-}
-
-.transition-fade-exit-active {
-  opacity: 0;
-  transition: opacity 200ms;
-}
-
-.transition-slide-up-enter {
-  transform: translateY(200px)
-}
-
-.transition-slide-up-enter-active {
-  transform: translateY(0px);
-  transition: all 200ms;
-}
-
-.transition-slide-up-exit {
-  transform: translateY(0px);
-}
-
-.transition-slide-up-exit-active {
-  transform: translateY(200px);
-  transition: all 200ms;
 }

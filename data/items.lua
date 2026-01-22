@@ -67,6 +67,7 @@ return {
 	['burger'] = {
 		label = 'Burger',
 		weight = 220,
+		description = 'Pyszny burger',
 		client = {
 			status = { hunger = 200000 },
 			anim = 'eating',
@@ -129,6 +130,50 @@ return {
 		}
 	},
 
+	--polar-drugs
+
+	['weed'] = {
+		label = 'weed',
+		weight = 1,
+		stack = true,
+		close = true,
+		description = 'Ulubienieć niskiej i średniej klasy',
+	},
+
+	['cocaine'] = {
+		label = 'cocaine',
+		weight = 1,
+		stack = true,
+		close = true,
+		description = 'Główna słabość korpo-szczurów',
+	},
+
+	['fentanyl'] = {
+		label = 'fentanyl',
+		weight = 1,
+		stack = true,
+		close = true,
+		description = 'Bilet w jedną stronę',
+	},
+
+	['heroin'] = {
+		label = 'heroin',
+		weight = 1,
+		stack = true,
+		close = true,
+		description = 'Serio ktoś to jeszcze bierze? To nie lata 90',
+	},
+
+	['meth'] = {
+		label = 'meth',
+		weight = 1,
+		stack = true,
+		close = true,
+		description = 'Heisenberg byłby dumny',
+	},
+
+	--polar-lockpick
+
 	['lockpick'] = {
 		label = 'wytrych',
 		weight = 160,
@@ -139,6 +184,8 @@ return {
 		consume = 0.2,
 		client = { export = 'polar-lockpick.useLockpick' }
 	},
+
+	--polar-phone
 
 	['phone'] = {
 		label = 'Phone',
@@ -163,6 +210,8 @@ return {
 			end
 		}
 	},
+
+	--polar-mechanic
 
 	['tuning_project'] = {
 		label = 'Projekt samochodu',

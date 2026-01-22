@@ -1,15 +1,30 @@
+import { useCallback, useState } from 'react';
+import {
+  DndContext,
+  DragOverlay,
+  DragStartEvent,
+  DragEndEvent,
+  PointerSensor,
+  TouchSensor,
+  useSensor,
+  useSensors,
+} from '@dnd-kit/core';
 import InventoryComponent from './components/inventory';
 import useNuiEvent from './hooks/useNuiEvent';
 import { Items } from './store/items';
 import { Locale } from './store/locale';
 import { setImagePath } from './store/imagepath';
 import { setupInventory } from './store/inventory';
-import { Inventory } from './typings';
+import { DragSource, DropTarget, Inventory, InventoryType } from './typings';
 import { useAppDispatch } from './store';
 import { debugData } from './utils/debugData';
-import DragPreview from './components/utils/DragPreview';
 import { fetchNui } from './utils/fetchNui';
-import { useDragDropManager } from 'react-dnd';
+import { onDrop } from './dnd/onDrop';
+import { onBuy } from './dnd/onBuy';
+import { onCraft } from './dnd/onCraft';
+import { onUse } from './dnd/onUse';
+import { onGive } from './dnd/onGive';
+import { closeTooltip } from './store/tooltip';
 import KeyPress from './components/utils/KeyPress';
 
 debugData([
@@ -26,19 +41,13 @@ debugData([
         items: [
           {
             slot: 1,
-            name: 'iron',
-            weight: 3000,
-            metadata: {
-              description: `name: Svetozar Miletic  \n Gender: Male`,
-              ammo: 3,
-              mustard: '60%',
-              ketchup: '30%',
-              mayo: '10%',
-            },
+            name: 'burger',
+            weight: 350,
+
             count: 5,
           },
-          { slot: 2, name: 'powersaw', weight: 0, count: 1, metadata: { durability: 75 } },
-          { slot: 3, name: 'copper', weight: 100, count: 12, metadata: { type: 'Special' } },
+          { slot: 2, name: 'paperbag', weight: 4, count: 1, metadata: { durability: 75 } },
+          { slot: 3, name: 'phone', weight: 240, count: 12, metadata: { type: 'Special' } },
           {
             slot: 4,
             name: 'water',
@@ -47,16 +56,6 @@ debugData([
             metadata: { description: 'Generic item description' },
           },
           { slot: 5, name: 'water', weight: 100, count: 1 },
-          {
-            slot: 6,
-            name: 'backwoods',
-            weight: 100,
-            count: 1,
-            metadata: {
-              label: 'Russian Cream',
-              imageurl: 'https://i.imgur.com/2xHhTTz.png',
-            },
-          },
         ],
       },
       rightInventory: {
@@ -89,7 +88,21 @@ debugData([
 
 const App: React.FC = () => {
   const dispatch = useAppDispatch();
-  const manager = useDragDropManager();
+  const [activeDragData, setActiveDragData] = useState<DragSource | null>(null);
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 5,
+      },
+    }),
+    useSensor(TouchSensor, {
+      activationConstraint: {
+        delay: 150,
+        tolerance: 5,
+      },
+    })
+  );
 
   useNuiEvent<{
     locale: { [key: string]: string };
@@ -107,20 +120,78 @@ const App: React.FC = () => {
   fetchNui('uiLoaded', {});
 
   useNuiEvent('closeInventory', () => {
-    manager.dispatch({ type: 'dnd-core/END_DRAG' });
+    setActiveDragData(null);
   });
 
+  const handleDragStart = useCallback((event: DragStartEvent) => {
+    const data = event.active.data.current as DragSource | undefined;
+    if (data) {
+      setActiveDragData(data);
+    }
+  }, []);
+
+  const handleDragEnd = useCallback(
+    (event: DragEndEvent) => {
+      setActiveDragData(null);
+      dispatch(closeTooltip());
+
+      const { active, over } = event;
+
+      if (!over || !active.data.current) return;
+
+      const source = active.data.current as DragSource;
+      const targetData = over.data.current as DropTarget | { action: string } | undefined;
+
+      if (!targetData) return;
+
+      // Handle control buttons (Use/Give)
+      if ('action' in targetData) {
+        if (targetData.action === 'use' && source.inventory === 'player') {
+          onUse(source.item);
+        } else if (targetData.action === 'give' && source.inventory === 'player') {
+          onGive(source.item);
+        }
+        return;
+      }
+
+      // Handle inventory drops
+      switch (source.inventory) {
+        case InventoryType.SHOP:
+          onBuy(source, targetData);
+          break;
+        case InventoryType.CRAFTING:
+          onCraft(source, targetData);
+          break;
+        default:
+          onDrop(source, targetData);
+          break;
+      }
+    },
+    [dispatch]
+  );
+
   return (
-    <div className="app-wrapper">
-      <InventoryComponent />
-      <DragPreview />
-      <KeyPress />
-    </div>
+    <DndContext sensors={sensors} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
+      <div className="app-wrapper">
+        <InventoryComponent />
+        <DragOverlay dropAnimation={null}>
+          {activeDragData && (
+            <div
+              className="item-drag-preview"
+              style={{
+                backgroundImage: activeDragData.image,
+              }}
+            />
+          )}
+        </DragOverlay>
+        <KeyPress />
+      </div>
+    </DndContext>
   );
 };
 
-addEventListener("dragstart", function(event) {
-  event.preventDefault()
-})
+addEventListener('dragstart', function (event) {
+  event.preventDefault();
+});
 
 export default App;

@@ -19,4 +19,20 @@ export const Items: {
     usable: false,
     count: 0,
   },
+  paperbag: {
+    name: 'paperbag',
+    close: false,
+    label: 'PAPERBAG',
+    stack: false,
+    usable: false,
+    count: 0,
+  },
+  phone: {
+    name: 'phone',
+    close: false,
+    label: 'PHONE',
+    stack: false,
+    usable: false,
+    count: 0,
+  },
 };

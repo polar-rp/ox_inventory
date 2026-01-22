@@ -1545,7 +1545,6 @@ RegisterNetEvent('ox_inventory:setPlayerInventory', function(currentDrops, inven
 
 		if invOpen then
 			DisableAllControlActions(0)
-			-- HideHudAndRadarThisFrame()
 
 			for i = 1, #EnableKeys do
 				EnableControlAction(0, EnableKeys[i], true)
