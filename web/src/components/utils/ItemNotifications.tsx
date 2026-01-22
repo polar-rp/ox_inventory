@@ -1,5 +1,7 @@
-import React, { useContext, useEffect, useState } from 'react';
-import { Affix, Paper, Stack, Group, Image, Text, Transition, Box, rem } from '@mantine/core';
+import React, { useContext, useState, useEffect } from 'react';
+import { Affix, Card, Stack, Group, Image, Text, Transition, Box } from '@mantine/core';
+import { isEnvBrowser } from '../../utils/misc';
+import { debugData } from '../../utils/debugData';
 import useNuiEvent from '../../hooks/useNuiEvent';
 import { Locale } from '../../store/locale';
 import { getItemUrl } from '../../helpers';
@@ -29,30 +31,41 @@ const ItemNotification: React.FC<{ item: ItemNotificationProps }> = ({ item }) =
   const slotItem = item.item;
 
   return (
-    <Paper
+    <Card
       withBorder
-      p="sm"
       shadow="xl"
-      w={rem(130)}
+      padding="xs"
+      w={130}
+      ta="center"
     >
-      <Stack gap={4} align="center">
-        <Text size="xs" fw={800} tt="uppercase" ta="center">
-          {item.text}
-        </Text>
+      <Text
+        size="xs"
+        fw={800}
+        tt="uppercase"
+        c="dimmed"
+      >
+        {item.text}
+      </Text>
 
-        <Box pos="relative" w={rem(64)} h={rem(64)}>
-          <Image
-            src={getItemUrl(slotItem)}
-            fallbackSrc="none"
-            fit="contain"
-          />
-        </Box>
+      <Card.Section withBorder>
+        <Image
+          src={getItemUrl(slotItem)}
+          fit="contain"
+          mx="auto"
+          w={64}
+          h={64}
+          alt={slotItem.metadata?.label || Items[slotItem.name]?.label}
+        />
+      </Card.Section>
 
-        <Text size="xs" fw={600} tt="uppercase" ta="center" truncate="end" w="100%" c="gray.1">
-          {slotItem.metadata?.label || Items[slotItem.name]?.label}
-        </Text>
-      </Stack>
-    </Paper>
+      <Text
+        size="sm"
+        fw={600}
+        truncate="end"
+      >
+        {slotItem.metadata?.label || Items[slotItem.name]?.label}
+      </Text>
+    </Card>
   );
 };
 
@@ -65,12 +78,34 @@ export const ItemNotificationsProvider = ({ children }: { children: React.ReactN
 
     setTimeout(() => {
       setNotifications((prev) => prev.filter((n) => n.id !== id));
-    }, 3000);
+    }, 6000);
   };
 
   useNuiEvent<[item: SlotWithItem, text: string, count?: number]>('itemNotify', ([item, text, count]) => {
-    add({ item: item, text: count ? `${Locale[text]} ${count}x` : `${Locale[text]}` });
+    add({ item: item, text: count ? `${Locale[text] || text} ${count}x` : `${Locale[text] || text}` });
   });
+
+  useEffect(() => {
+    if (isEnvBrowser()) {
+      debugData([
+        {
+          action: 'itemNotify',
+          data: [
+            { name: 'water', metadata: { label: 'Water' } },
+            'ui_removed',
+            1,
+          ],
+        },
+      ], 1500);
+
+      (window as any).debugNotify = (item: any, text: string, count?: number) => {
+        add({
+          item: item as SlotWithItem,
+          text: count ? `${Locale[text] || text} ${count}x` : `${Locale[text] || text}`
+        });
+      };
+    }
+  }, []);
 
   return (
     <ItemNotificationsContext.Provider value={{ add }}>

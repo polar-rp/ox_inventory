@@ -34,7 +34,7 @@ const InventoryControl: React.FC = () => {
         <>
             <UsefulControls opened={infoVisible} onClose={close} />
 
-            <Paper shadow="md" p="md">
+            <Paper shadow="md" p="md" withBorder>
                 <Group >
                     <NumberInput
                         value={itemAmount}
